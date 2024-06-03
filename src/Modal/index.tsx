@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import './index.less';
 
 interface UseModalReturn {
@@ -49,10 +49,11 @@ const useModal = (): UseModalReturn => {
 
   useEffect(() => {
     if (rootEl) {
+      const root = createRoot(rootEl); // createRoot(container!) if you use TypeScript
       if (visible) {
-        ReactDOM.render(renderModel(), rootEl);
+        root.render(renderModel());
       } else {
-        ReactDOM.unmountComponentAtNode(rootEl);
+        root.unmount();
       }
     }
   }, [rootEl, visible]);
