@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { createRoot } from 'react-dom/client';
+import { Root, createRoot } from 'react-dom/client';
 import './index.less';
 
 interface UseModalReturn {
@@ -10,7 +10,8 @@ interface UseModalReturn {
 const useModal = (): UseModalReturn => {
   const [visible, setVisible] = useState(false);
   const [message, setMessage] = useState<string>('');
-  const [rootEl, setRootEl] = useState<HTMLElement | null>(null);
+  const [root, setRoot] = useState<Root | null>(null);
+
   useEffect(() => {
     const idName = 'ns-dumi-modal-root';
     let el = document.getElementById(idName);
@@ -19,10 +20,10 @@ const useModal = (): UseModalReturn => {
       el.id = idName;
       document.body.appendChild(el);
     }
-    setRootEl(el);
+    setRoot(createRoot(el));
     return () => {
-      if (el) {
-        document.body.removeChild(el);
+      if (root) {
+        root.unmount();
       }
     };
   }, []);
@@ -36,7 +37,7 @@ const useModal = (): UseModalReturn => {
     setVisible(false);
   }, []);
 
-  const renderModel = () => {
+  const renderModal = () => {
     return (
       <div className="ns-dumi-modal">
         <div className="ns-dumi-modal-content">
@@ -48,15 +49,10 @@ const useModal = (): UseModalReturn => {
   };
 
   useEffect(() => {
-    if (rootEl) {
-      const root = createRoot(rootEl); // createRoot(container!) if you use TypeScript
-      if (visible) {
-        root.render(renderModel());
-      } else {
-        root.unmount();
-      }
+    if (root) {
+      root.render(visible ? renderModal() : null);
     }
-  }, [rootEl, visible]);
+  }, [root, visible]);
 
   return { open, close };
 };
